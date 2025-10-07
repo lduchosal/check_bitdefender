@@ -34,7 +34,7 @@ class DefenderClient:
         Args:
             authenticator: Authentication provider
             timeout: Request timeout in seconds
-            region: Geographic region (eu, eu3, us, uk)
+            region: Geographic region (api)
             verbose_level: Verbosity level for logging
         """
         self.authenticator = authenticator
@@ -48,4 +48,4 @@ class DefenderClient:
         endpoints = {
             "api": "https://cloudgz.gravityzone.bitdefender.com",
         }
-        return endpoints.get(region, endpoints["eu"])
+        return endpoints.get(region, endpoints["api"])
