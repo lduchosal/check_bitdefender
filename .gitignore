@@ -1,0 +1,10 @@
+﻿/build/
+/check_bitdefender.egg-info/
+/dist/
+/.env
+/check_bitdefender.ini
+/doc/private
+/.pdm-build/
+/.venv/
+/.idea/
+/.claude/

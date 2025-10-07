@@ -1,0 +1,10 @@
+[auth]
+# Required for authentication
+token = xxx_secret_token_from_account_xxx
+
+[settings]
+# Optional: API version (default: v1.0)
+api_version = v1.0
+
+# Optional: Timeout in seconds (default: 30)
+timeout = 10
