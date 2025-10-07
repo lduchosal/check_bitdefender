@@ -3,7 +3,7 @@
 import sys
 from typing import Optional, Any
 
-from check_bitdefender.core.auth import get_authenticator
+from check_bitdefender.core.auth import get_token
 from check_bitdefender.core.config import load_config
 from check_bitdefender.core.defender import DefenderClient
 from check_bitdefender.core.nagios import NagiosPlugin
@@ -33,10 +33,15 @@ def register_endpoints_commands(main_group: Any) -> None:
             cfg = load_config(config)
 
             # Get authenticator
-            authenticator = get_authenticator(cfg)
+            authenticator = get_token(cfg)
+
+            # Get parent_id from config if available
+            parent_id = None
+            if cfg.has_section("settings"):
+                parent_id = cfg["settings"].get("parent_id")
 
             # Create Defender client
-            client = DefenderClient(authenticator, verbose_level=verbose)
+            client = DefenderClient(authenticator, verbose_level=verbose, parent_id=parent_id)
 
             # Create the service
             service = EndpointsService(client, verbose_level=verbose)

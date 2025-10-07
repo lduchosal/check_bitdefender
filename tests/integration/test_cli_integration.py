@@ -443,3 +443,105 @@ class TestDetailCommand:
         )
         assert "-m, -i, --endpoint-id, --id TEXT" in result.output
         assert "-d, --dns-name TEXT" in result.output
+
+
+class TestEndpointsCommand:
+    """Test endpoints command functionality."""
+
+    @patch("check_bitdefender.cli.commands.endpoints.load_config")
+    @patch("check_bitdefender.cli.commands.endpoints.get_token")
+    @patch("check_bitdefender.cli.commands.endpoints.DefenderClient")
+    @patch("check_bitdefender.cli.commands.endpoints.EndpointsService")
+    @patch("check_bitdefender.cli.commands.endpoints.NagiosPlugin")
+    def test_endpoints_without_args(
+        self, mock_nagios, mock_service, mock_client, mock_token, mock_config, cli_runner
+    ):
+        """Test endpoints command without arguments."""
+        # Setup mocks
+        mock_config.return_value = {"config": "test"}
+        mock_token.return_value = "test_token"
+        mock_client.return_value = Mock()
+        mock_service_instance = Mock()
+        mock_service.return_value = mock_service_instance
+        mock_plugin = Mock()
+        mock_nagios.return_value = mock_plugin
+        mock_plugin.check.return_value = 0
+
+        result = cli_runner.invoke(main, ["endpoints"])
+
+        assert result.exit_code == 0
+        mock_plugin.check.assert_called_once_with(
+            warning=10, critical=25, verbose=0
+        )
+
+    @patch("check_bitdefender.cli.commands.endpoints.load_config")
+    @patch("check_bitdefender.cli.commands.endpoints.get_token")
+    @patch("check_bitdefender.cli.commands.endpoints.DefenderClient")
+    @patch("check_bitdefender.cli.commands.endpoints.EndpointsService")
+    @patch("check_bitdefender.cli.commands.endpoints.NagiosPlugin")
+    def test_endpoints_with_custom_thresholds(
+        self, mock_nagios, mock_service, mock_client, mock_token, mock_config, cli_runner
+    ):
+        """Test endpoints command with custom thresholds."""
+        # Setup mocks
+        mock_config.return_value = {"config": "test"}
+        mock_token.return_value = "test_token"
+        mock_client.return_value = Mock()
+        mock_service_instance = Mock()
+        mock_service.return_value = mock_service_instance
+        mock_plugin = Mock()
+        mock_nagios.return_value = mock_plugin
+        mock_plugin.check.return_value = 0
+
+        result = cli_runner.invoke(main, ["endpoints", "-w", "5", "-c", "15"])
+
+        assert result.exit_code == 0
+        mock_plugin.check.assert_called_once_with(
+            warning=5, critical=15, verbose=0
+        )
+
+    @patch("check_bitdefender.cli.commands.endpoints.load_config")
+    @patch("check_bitdefender.cli.commands.endpoints.get_token")
+    @patch("check_bitdefender.cli.commands.endpoints.DefenderClient")
+    @patch("check_bitdefender.cli.commands.endpoints.EndpointsService")
+    @patch("check_bitdefender.cli.commands.endpoints.NagiosPlugin")
+    def test_endpoints_with_verbose(
+        self, mock_nagios, mock_service, mock_client, mock_token, mock_config, cli_runner
+    ):
+        """Test endpoints command with verbose flag."""
+        # Setup mocks
+        mock_config.return_value = {"config": "test"}
+        mock_token.return_value = "test_token"
+        mock_client.return_value = Mock()
+        mock_service_instance = Mock()
+        mock_service.return_value = mock_service_instance
+        mock_plugin = Mock()
+        mock_nagios.return_value = mock_plugin
+        mock_plugin.check.return_value = 0
+
+        result = cli_runner.invoke(main, ["endpoints", "-v"])
+
+        assert result.exit_code == 0
+        mock_plugin.check.assert_called_once_with(
+            warning=10, critical=25, verbose=1
+        )
+
+    @patch("check_bitdefender.cli.commands.endpoints.load_config")
+    def test_endpoints_command_error(self, mock_config, cli_runner):
+        """Test endpoints command error handling."""
+        mock_config.side_effect = Exception("Configuration error")
+
+        result = cli_runner.invoke(main, ["endpoints"])
+
+        # Exit code should be 3 for UNKNOWN error
+        assert result.exit_code == 3
+        assert "UNKNOWN: Configuration error" in result.output
+
+    def test_endpoints_command_help(self, cli_runner):
+        """Test endpoints command help displays usage information."""
+        result = cli_runner.invoke(main, ["endpoints", "--help"])
+
+        assert result.exit_code == 0
+        assert "List all endpoints in BitDefender GravityZone" in result.output
+        assert "-w, --warning" in result.output
+        assert "-c, --critical" in result.output

@@ -32,21 +32,6 @@ pip install git+https://github.com/lduchosal/check_bitdefender.git
 ### Basic Usage
 
 ```bash
-# Check endpoint onboarding status
-check_bitdefender onboarding -d endpoint.domain.tld
-
-# Check last seen (with custom thresholds)
-check_bitdefender lastseen -d endpoint.domain.tld -W 7 -C 30
-
-# Check vulnerabilities
-check_bitdefender vulnerabilities -d endpoint.domain.tld -W 10 -C 100
-
-# Check products with CVE vulnerabilities
-check_bitdefender products -d endpoint.domain.tld -W 5 -C 1
-
-# Check alerts
-check_bitdefender alerts -d endpoint.domain.tld -W 1 -C 5
-
 # List all endpoints
 check_bitdefender endpoints
 
@@ -58,11 +43,6 @@ check_bitdefender detail -d endpoint.domain.tld
 
 | Command | Description | Default Thresholds |
 |---------|-------------|-------------------|
-| `onboarding` | Check endpoint onboarding status | W:1, C:2 |
-| `lastseen` | Days since endpoint last seen | W:7, C:30 |
-| `vulnerabilities` | Vulnerability score calculation | W:10, C:100 |
-| `products` | Count of vulnerable software with CVEs | W:5, C:1 |
-| `alerts` | Count of unresolved alerts | W:1, C:0 |
 | `endpoints` | List all endpoints | W:10, C:25 |
 | `detail` | Get detailed endpoint information | - |
 
@@ -106,21 +86,7 @@ Create `check_bitdefender.ini` in your Nagios directory or current working direc
 #### Client Secret Authentication
 ```ini
 [auth]
-client_id = your-application-client-id
-client_secret = your-client-secret
-tenant_id = your-azure-tenant-id
-
-[settings]
-timeout = 5
-```
-
-#### Certificate Authentication
-```ini
-[auth]
-client_id = your-application-client-id
-tenant_id = your-azure-tenant-id
-certificate_path = /path/to/certificate.pem
-private_key_path = /path/to/private_key.pem
+token = your-token-for-gravity-zone
 
 [settings]
 timeout = 5
@@ -128,14 +94,8 @@ timeout = 5
 
 ### BitDefender GravityZone API Setup
 
-1. **Register Application** in Azure Active Directory
 2. **Grant API Permissions**:
-   - `Endpoint.Read.All`
-   - `Vulnerability.Read`
-   - `Vulnerability.Read.All`
-   - `Alert.Read.All`
-3. **Create Authentication** (Secret or Certificate)
-4. **Note Credentials** (Client ID, Tenant ID, Secret/Certificate)
+   - `xxx`
 
 📚 [Complete API Setup Guide](https://learn.microsoft.com/en-us/defender-endpoint/api/api-hello-world)
 
@@ -167,20 +127,6 @@ define command {
     command_line    $USER1$/check_bitdefender/bin/check_bitdefender lastseen -d $HOSTALIAS$ -W 7 -C 30
 }
 
-define command {
-    command_name    check_bitdefender_vulnerabilities
-    command_line    $USER1$/check_bitdefender/bin/check_bitdefender vulnerabilities -d $HOSTALIAS$ -W 10 -C 100
-}
-
-define command {
-    command_name    check_bitdefender_products
-    command_line    $USER1$/check_bitdefender/bin/check_bitdefender products -d $HOSTALIAS$ -W 5 -C 1
-}
-
-define command {
-    command_name    check_bitdefender_alerts
-    command_line    $USER1$/check_bitdefender/bin/check_bitdefender alerts -d $HOSTALIAS$ -W 1 -C 5
-}
 ```
 
 ### Service Definitions
@@ -201,26 +147,6 @@ define service {
     hostgroup_name          bitdefender
 }
 
-define service {
-    use                     generic-service
-    service_description     BITDEFENDER_VULNERABILITIES
-    check_command           check_bitdefender_vulnerabilities
-    hostgroup_name          bitdefender
-}
-
-define service {
-    use                     generic-service
-    service_description     BITDEFENDER_PRODUCTS
-    check_command           check_bitdefender_products
-    hostgroup_name          bitdefender
-}
-
-define service {
-    use                     generic-service
-    service_description     BITDEFENDER_ALERTS
-    check_command           check_bitdefender_alerts
-    hostgroup_name          bitdefender
-}
 ```
 
 ## 🏗️ Architecture
@@ -231,13 +157,7 @@ This plugin follows **clean architecture** principles with clear separation of c
 check_bitdefender/
 ├── 📁 cli/                     # Command-line interface
 │   ├── commands/               # Individual command handlers
-│   │   ├── onboarding.py      # Onboarding status command
-│   │   ├── lastseen.py        # Last seen command
-│   │   ├── vulnerabilities.py # Vulnerabilities command
-│   │   ├── products.py        # Products CVE monitoring command
-│   │   ├── alerts.py          # Alerts monitoring command
 │   │   ├── endpoints.py        # List endpoints command
-│   │   └── detail.py          # Endpoint detail command
 │   ├── decorators.py          # Common CLI decorators
 │   └── handlers.py            # CLI handlers
 ├── 📁 core/                    # Core business logic
@@ -248,13 +168,7 @@ check_bitdefender/
 │   ├── nagios.py              # Nagios plugin framework
 │   └── logging_config.py      # Logging configuration
 ├── 📁 services/                # Business services
-│   ├── onboarding_service.py  # Onboarding business logic
-│   ├── lastseen_service.py    # Last seen business logic
-│   ├── vulnerabilities_service.py # Vulnerability business logic
-│   ├── products_service.py    # Products CVE monitoring business logic
-│   ├── alerts_service.py      # Alerts monitoring business logic
 │   ├── endpoints_service.py    # Endpoints business logic
-│   ├── detail_service.py      # Detail business logic
 │   └── models.py              # Data models
 └── 📁 tests/                   # Comprehensive test suite
     ├── unit/                   # Unit tests

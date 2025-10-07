@@ -72,6 +72,14 @@ class VerboseLogger:
         if self.verbose_level >= 3:
             self.logger.debug(f"TRACE: {message}", *args, **kwargs)
 
+    def warning(self, message: str, *args: Any, **kwargs: Any) -> None:
+        """Log warning message."""
+        self.logger.warning(message, *args, **kwargs)
+
+    def error(self, message: str, *args: Any, **kwargs: Any) -> None:
+        """Log error message."""
+        self.logger.error(message, *args, **kwargs)
+
     def api_call(
         self,
         method: str,

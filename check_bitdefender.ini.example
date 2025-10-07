@@ -8,3 +8,7 @@ api_version = v1.0
 
 # Optional: Timeout in seconds (default: 30)
 timeout = 10
+
+# Optional: Parent Node ID to filter endpoints (company or group ID)
+# If not specified, retrieves endpoints from all companies/groups
+parent_id =
