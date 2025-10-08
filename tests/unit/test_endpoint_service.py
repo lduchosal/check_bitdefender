@@ -34,13 +34,13 @@ def test_get_result_success(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test1.com",
+                "fqdn": "test1.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             },
             {
                 "id": "ep2",
-                "computerDnsName": "test2.com",
+                "fqdn": "test2.com",
                 "onboardingStatus": "InsufficientInfo",
                 "osPlatform": "Linux"
             }
@@ -87,25 +87,25 @@ def test_endpoint_sorting_by_status(service, mock_client):
         "value": [
             {
                 "id": "ep3",
-                "computerDnsName": "unsupported.com",
+                "fqdn": "unsupported.com",
                 "onboardingStatus": "Unsupported",
                 "osPlatform": "Windows"
             },
             {
                 "id": "ep1",
-                "computerDnsName": "alpha.com",
+                "fqdn": "alpha.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             },
             {
                 "id": "ep2",
-                "computerDnsName": "beta.com",
+                "fqdn": "beta.com",
                 "onboardingStatus": "InsufficientInfo",
                 "osPlatform": "Linux"
             },
             {
                 "id": "ep4",
-                "computerDnsName": "bravo.com",
+                "fqdn": "bravo.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Linux"
             }
@@ -140,7 +140,7 @@ def test_logging_calls(mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test.com",
+                "fqdn": "test.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -160,13 +160,13 @@ def test_get_details_success(service, mock_client):
         "value": [
             {
                 "id": "1a2b3c4d5e6f7890abcdef12",
-                "computerDnsName": "server01.com",
+                "fqdn": "server01.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             },
             {
                 "id": "2b3c4d5e6f7890abcdef1234",
-                "computerDnsName": "server02.com",
+                "fqdn": "server02.com",
                 "onboardingStatus": "InsufficientInfo",
                 "osPlatform": "Linux"
             }
@@ -210,19 +210,19 @@ def test_onboarding_status_indicators(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "onboarded.com",
+                "fqdn": "onboarded.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             },
             {
                 "id": "ep2",
-                "computerDnsName": "insufficient.com",
+                "fqdn": "insufficient.com",
                 "onboardingStatus": "InsufficientInfo",
                 "osPlatform": "Linux"
             },
             {
                 "id": "ep3",
-                "computerDnsName": "unsupported.com",
+                "fqdn": "unsupported.com",
                 "onboardingStatus": "Unsupported",
                 "osPlatform": "Mac"
             }
@@ -251,7 +251,7 @@ def test_get_result_with_null_values(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": None,
+                "fqdn": None,
                 "onboardingStatus": None,
                 "osPlatform": None
             }
@@ -272,7 +272,7 @@ def test_large_endpoint_list(service, mock_client):
     large_list = [
         {
             "id": f"ep{i}",
-            "computerDnsName": f"endpoint{i}.example.com",
+            "fqdn": f"endpoint{i}.example.com",
             "onboardingStatus": "Onboarded" if i % 2 == 0 else "InsufficientInfo",
             "osPlatform": "Windows" if i % 3 == 0 else "Linux"
         }

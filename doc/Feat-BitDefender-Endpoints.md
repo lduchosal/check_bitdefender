@@ -141,9 +141,9 @@ def test_get_result_success():
     # Mock API response with multiple endpoints
     mock_response = {
         "value": [
-            {"id": "ep1", "computerDnsName": "test1.com",
+            {"id": "ep1", "fqdn": "test1.com",
              "onboardingStatus": "Onboarded", "osPlatform": "Windows"},
-            {"id": "ep2", "computerDnsName": "test2.com",
+            {"id": "ep2", "fqdn": "test2.com",
              "onboardingStatus": "InsufficientInfo", "osPlatform": "Linux"}
         ]
     }

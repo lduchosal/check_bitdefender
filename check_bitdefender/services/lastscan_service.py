@@ -62,7 +62,7 @@ class LastScanService:
             if endpoint_id and endpoint.get("id") == endpoint_id:
                 matching_endpoint = endpoint
                 break
-            elif dns_name and endpoint.get("computerDnsName") == dns_name:
+            elif dns_name and endpoint.get("fqdn") == dns_name:
                 matching_endpoint = endpoint
                 break
 
@@ -91,7 +91,7 @@ class LastScanService:
             return result
 
         # Calculate days since last scan
-        computer_name = matching_endpoint.get("computerDnsName", dns_name or endpoint_id)
+        computer_name = matching_endpoint.get("fqdn", dns_name or endpoint_id)
 
         # Get last successful scan data from details
         last_scan_data = details_data.get("lastSuccessfulScan")

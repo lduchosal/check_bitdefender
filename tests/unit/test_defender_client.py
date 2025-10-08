@@ -129,13 +129,13 @@ def test_list_endpoints_success(mock_post, client):
     assert "value" in result
     assert len(result["value"]) == 2
     assert result["value"][0]["id"] == "ep1"
-    assert result["value"][0]["computerDnsName"] == "host1.domain.com"
+    assert result["value"][0]["fqdn"] == "host1.domain.com"
     assert result["value"][0]["onboardingStatus"] == "Onboarded"
     assert result["value"][0]["osPlatform"] == "Windows"
     assert result["value"][0]["lastSeen"] == "2024-01-01T00:00:00Z"
 
     assert result["value"][1]["id"] == "ep2"
-    assert result["value"][1]["computerDnsName"] == "host2"
+    assert result["value"][1]["fqdn"] == "host2"
     assert result["value"][1]["onboardingStatus"] == "InsufficientInfo"
     assert result["value"][1]["osPlatform"] == "Linux"
     assert result["value"][1]["lastSeen"] == "2024-01-02T00:00:00Z"

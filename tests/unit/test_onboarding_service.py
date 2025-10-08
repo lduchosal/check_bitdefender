@@ -33,7 +33,7 @@ def test_get_result_endpoint_onboarded(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -55,7 +55,7 @@ def test_get_result_endpoint_not_found(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "other.domain.com",
+                "fqdn": "other.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -76,7 +76,7 @@ def test_get_result_endpoint_not_onboarded(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "InsufficientInfo",
                 "osPlatform": "Windows"
             }
@@ -98,7 +98,7 @@ def test_get_result_by_endpoint_id(service, mock_client):
         "value": [
             {
                 "id": "ep123",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -157,7 +157,7 @@ def test_logging_calls(mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -177,19 +177,19 @@ def test_get_result_multiple_endpoints(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "server1.domain.com",
+                "fqdn": "server1.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             },
             {
                 "id": "ep2",
-                "computerDnsName": "server2.domain.com",
+                "fqdn": "server2.domain.com",
                 "onboardingStatus": "InsufficientInfo",
                 "osPlatform": "Linux"
             },
             {
                 "id": "ep3",
-                "computerDnsName": "server3.domain.com",
+                "fqdn": "server3.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -210,7 +210,7 @@ def test_get_result_unsupported_status(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "Unsupported",
                 "osPlatform": "Mac"
             }

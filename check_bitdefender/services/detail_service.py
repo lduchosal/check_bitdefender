@@ -60,7 +60,7 @@ class DetailService:
             # Find matching endpoint by DNS name
             matching_endpoint = None
             for endpoint in endpoints_data["value"]:
-                if endpoint.get("computerDnsName") == dns_name:
+                if endpoint.get("fqdn") == dns_name:
                     matching_endpoint = endpoint
                     endpoint_id = endpoint.get("id")
                     break

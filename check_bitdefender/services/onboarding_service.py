@@ -61,7 +61,7 @@ class OnboardingService:
             if endpoint_id and endpoint.get("id") == endpoint_id:
                 matching_endpoint = endpoint
                 break
-            elif dns_name and endpoint.get("computerDnsName") == dns_name:
+            elif dns_name and endpoint.get("fqdn") == dns_name:
                 matching_endpoint = endpoint
                 break
 
@@ -76,7 +76,7 @@ class OnboardingService:
 
         # Check onboarding status
         onboarding_status = matching_endpoint.get("onboardingStatus")
-        computer_name = matching_endpoint.get("computerDnsName", dns_name or endpoint_id)
+        computer_name = matching_endpoint.get("fqdn", dns_name or endpoint_id)
 
         if onboarding_status == "Onboarded":
             self.logger.info(f"Endpoint is onboarded: {computer_name}")

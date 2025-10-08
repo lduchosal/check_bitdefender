@@ -69,7 +69,7 @@ class DefenderClient:
                 "value": [
                     {
                         "id": "endpoint_id",
-                        "computerDnsName": "hostname.domain.com",
+                        "fqdn": "hostname.domain.com",
                         "onboardingStatus": "Onboarded|InsufficientInfo|Unsupported",
                         "osPlatform": "Windows|Linux|Mac",
                         ...
@@ -106,21 +106,37 @@ class DefenderClient:
         try:
             while True:
                 # Prepare JSONRPC request with pagination
-                params: Dict[str, Any] = {
-                    "page": page,
-                    "perPage": per_page
-                }
-
-                # Add parent_id if provided
-                if effective_parent_id:
-                    params["parentId"] = effective_parent_id
 
                 payload = {
-                    "params": params,
-                    "jsonrpc": "2.0",
-                    "method": "getEndpointsList",
-                    "id": f"check_bitdefender_endpoints_page_{page}"
-                }
+                   "params": {
+                       "parentId": effective_parent_id,
+                       "page": 1,
+                       "perPage": 100,
+                       "filters": {
+                           "type": {
+                               "computers": True,
+                               "virtualMachines": True
+                           },
+                           "depth": {
+                               "allItemsRecursively": True
+                           }
+                       },
+                       "options": {
+                           "companies": {
+                               "returnAllProducts": True
+                           },
+                           "endpoints": {
+                               "returnProductOutdated": True,
+                               "includeScanLogs": True
+                           }
+                       }
+                   },
+                   "jsonrpc": "2.0",
+                   "method": "getNetworkInventoryItems",
+                   "id": "301f7b05-ec02-481b-9ed6-c07b97de2b7b"
+              }
+
+
 
                 self.logger.debug(f"Request method: {payload['method']}, page: {page}/{total_pages or '?'}")
 
@@ -166,7 +182,7 @@ class DefenderClient:
                 "value": [
                     {
                         "id": item.get("id"),
-                        "computerDnsName": item.get("fqdn", item.get("name")),
+                        "fqdn": item.get("details").get("fqdn", item.get("name")),
                         "onboardingStatus": self._map_managed_status(item.get("isManaged")),
                         "osPlatform": self._extract_os_platform(item.get("operatingSystemVersion", "")),
                         # Try lastSeen first, fall back to lastSuccessfulScan.date

@@ -35,7 +35,7 @@ def test_get_result_endpoint_not_found(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "other.domain.com",
+                "fqdn": "other.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows",
                 "lastSeen": "2024-01-01T00:00:00Z"
@@ -99,7 +99,7 @@ def test_logging_calls(mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -120,7 +120,7 @@ def test_get_result_invalid_timestamp_format(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -145,7 +145,7 @@ def test_get_result_by_endpoint_id(service, mock_client):
         "value": [
             {
                 "id": "ep123",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -167,7 +167,7 @@ def test_get_result_api_error_on_details(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -188,7 +188,7 @@ def test_get_result_no_lastseen_in_details(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -215,7 +215,7 @@ def test_get_result_with_naive_datetime(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -240,7 +240,7 @@ def test_get_result_with_timestamp_number(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }
@@ -265,7 +265,7 @@ def test_get_result_with_z_suffix(service, mock_client):
         "value": [
             {
                 "id": "ep1",
-                "computerDnsName": "test.domain.com",
+                "fqdn": "test.domain.com",
                 "onboardingStatus": "Onboarded",
                 "osPlatform": "Windows"
             }

@@ -95,7 +95,7 @@ parent_id = your-company-id-here  # Optional: specify company/parent ID
 |--------|-------------|---------|
 | `-c, --config` | Configuration file path | `-c /custom/path/config.ini` |
 | `-m, --endpointId` | Endpoint ID (GUID) | `-m "12345678-1234-1234-1234-123456789abc"` |
-| `-d, --computerDnsName` | Computer DNS Name (FQDN) | `-d "server.domain.com"` |
+| `-d, --fqdn` | Computer DNS Name (FQDN) | `-d "server.domain.com"` |
 | `-W, --warning` | Warning threshold | `-W 10` |
 | `-C, --critical` | Critical threshold | `-C 100` |
 | `-v, --verbose` | Verbosity level | `-v`, `-vv`, `-vvv` |

@@ -28,14 +28,36 @@ authorizationHeader = "Basic " + encodedUserPassSequence
 apiEndpoint_Url = "https://cloudgz.gravityzone.bitdefender.com/api/v1.0/jsonrpc/network"
 
 # JSONRPC request payload
-request_payload = {
-    "params": {
-        "parentId":parentId
-    },
-    "jsonrpc": "2.0",
-    "method": "getEndpointsList",
-    "id": "301f7b05-ec02-481b-9ed6-c07b97de2b7b",
-}
+request_payload =   {
+       "params": {
+           "parentId": parentId,
+           "page": 1,
+           "perPage": 100,
+           "filters": {
+               "type": {
+                   "computers": True,
+                   "virtualMachines": True
+               },
+               "depth": {
+                   "allItemsRecursively": True
+               }
+           },
+           "options": {
+               "companies": {
+                   "returnAllProducts": True
+               },
+               "endpoints": {
+                   "returnProductOutdated": True,
+                   "includeScanLogs": True
+               }
+           }
+       },
+       "jsonrpc": "2.0",
+       "method": "getNetworkInventoryItems",
+       "id": "301f7b05-ec02-481b-9ed6-c07b97de2b7b"
+  }
+
+
 
 # Headers
 headers = {
