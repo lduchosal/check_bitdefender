@@ -2,7 +2,6 @@
 
 import configparser
 from typing import Union
-from azure.identity import ClientSecretCredential, CertificateCredential
 from check_bitdefender.core.exceptions import ConfigurationError
 
 
