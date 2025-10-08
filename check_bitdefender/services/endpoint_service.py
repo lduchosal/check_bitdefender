@@ -47,13 +47,13 @@ class EndpointsService:
             endpoints,
             key=lambda x: (
                 status_priority.get(x["onboardingStatus"] or "", 99),
-                x["details"]["fqdn"] or "",
+                x.get("fqdn", ""),
             ),
         )
         for endpoint in sorted_endpoints:
             onboarded = "✓" if endpoint["onboardingStatus"] == "Onboarded" else "✗"
             details.append(
-                f"{endpoint['id']}: {endpoint["details"]['fqdn']} ({endpoint['osPlatform']}) {onboarded}"
+                f"{endpoint['id']}: {endpoint['fqdn']} ({endpoint['osPlatform']}) {onboarded}"
             )
 
         result = {"value": endpoint_count, "details": details}
