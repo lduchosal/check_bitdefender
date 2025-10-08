@@ -169,7 +169,8 @@ class DefenderClient:
                         "computerDnsName": item.get("fqdn", item.get("name")),
                         "onboardingStatus": self._map_managed_status(item.get("isManaged")),
                         "osPlatform": self._extract_os_platform(item.get("operatingSystemVersion", "")),
-                        "lastSeen": item.get("lastSuccessfulScan", {}).get("date"),
+                        # Try lastSeen first, fall back to lastSuccessfulScan.date
+                        "lastSeen": item.get("lastSeen") or item.get("lastSuccessfulScan", {}).get("date"),
                     }
                     for item in all_items
                 ]
