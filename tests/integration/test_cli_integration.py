@@ -1,7 +1,7 @@
 """Integration tests for CLI interface end-to-end without external dependencies."""
 
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from click.testing import CliRunner
 
 from check_bitdefender.cli import main

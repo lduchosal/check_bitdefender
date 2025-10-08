@@ -1,7 +1,7 @@
 """Unit tests for EndpointsService."""
 
 import pytest
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock
 from check_bitdefender.services.endpoint_service import EndpointsService
 from check_bitdefender.core.exceptions import DefenderAPIError
 

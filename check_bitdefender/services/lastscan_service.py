@@ -1,7 +1,7 @@
 """Last scan service implementation."""
 
 from typing import Dict, Any, Optional
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from check_bitdefender.core.logging_config import get_verbose_logger
 
 

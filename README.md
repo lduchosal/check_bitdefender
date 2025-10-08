@@ -9,7 +9,7 @@ A comprehensive **Nagios plugin** for monitoring BitDefender GravityZone for End
 ## ✨ Features
 
 - 🔐 **Authentication** - Support for API Token
-- 🎯 **Multiple Endpoints** - Monitor onboarding status, last seen, vulnerabilities, products with CVEs, alerts, and endpoint details
+- 🎯 **Multiple Endpoints** - Monitor onboarding status, last seen, last scan, and endpoint details
 - 📊 **Nagios Compatible** - Standard exit codes and performance data output
 - 🏗️ **Clean Architecture** - Modular design with testable components
 - 🔧 **Flexible Configuration** - File-based configuration with sensible defaults
@@ -35,6 +35,15 @@ pip install git+https://github.com/lduchosal/check_bitdefender.git
 # List all endpoints
 check_bitdefender endpoints
 
+# Check onboarding status
+check_bitdefender onboarding -d endpoint.domain.tld
+
+# Check last seen (days since endpoint last connected)
+check_bitdefender lastseen -d endpoint.domain.tld
+
+# Check last scan (days since last antivirus scan)
+check_bitdefender lastscan -d endpoint.domain.tld
+
 # Get detailed endpoint info
 check_bitdefender detail -d endpoint.domain.tld
 ```
@@ -44,32 +53,10 @@ check_bitdefender detail -d endpoint.domain.tld
 | Command | Description | Default Thresholds |
 |---------|-------------|-------------------|
 | `endpoints` | List all endpoints | W:10, C:25 |
+| `onboarding` | Check endpoint onboarding status | W:2, C:1 |
+| `lastseen` | Check days since endpoint was last seen | W:7, C:30 |
+| `lastscan` | Check days since endpoint was last scanned | W:7, C:30 |
 | `detail` | Get detailed endpoint information | - |
-
-### Vulnerability Scoring
-
-The vulnerability score is calculated as:
-- **Critical vulnerabilities** × 100
-- **High vulnerabilities** × 10
-- **Medium vulnerabilities** × 5
-- **Low vulnerabilities** × 1
-
-### Products CVE Monitoring
-
-The products command monitors installed software with known CVE vulnerabilities:
-- **Groups CVEs by software** (name, version, vendor)
-- **Shows CVE details** including severity levels and disk paths
-- **Counts vulnerable software** (not individual CVEs)
-- **Default thresholds**: Warning at 5 vulnerable software, Critical at 1
-- **Displays up to 10 software entries** with first 5 CVEs per software
-
-### Alert Monitoring
-
-The alerts command monitors unresolved security alerts for a endpoint:
-- **Counts only unresolved alerts** (status ≠ "Resolved")
-- **Excludes informational alerts** when critical/warning alerts exist
-- **Shows alert details** including creation time, title, and severity
-- **Default thresholds**: Warning at 1 alert, Critical at 0 (meaning any alert triggers warning)
 
 ### Onboarding Status Values
 
@@ -83,21 +70,24 @@ The alerts command monitors unresolved security alerts for a endpoint:
 
 Create `check_bitdefender.ini` in your Nagios directory or current working directory:
 
-#### Client Secret Authentication
+#### API Token Authentication
 ```ini
 [auth]
-token = your-token-for-gravity-zone
+token = your-api-token-here
 
 [settings]
 timeout = 5
+parent_id = your-company-id-here  # Optional: specify company/parent ID
 ```
 
 ### BitDefender GravityZone API Setup
 
-2. **Grant API Permissions**:
-   - `xxx`
+1. **Log into GravityZone Control Center**
+2. **Navigate to My Account > API Keys**
+3. **Generate a new API key** with appropriate permissions
+4. **Copy the API token** to your configuration file
 
-📚 [Complete API Setup Guide](https://learn.microsoft.com/en-us/defender-endpoint/api/api-hello-world)
+📚 [Complete API Setup Guide](https://www.bitdefender.com/business/support/en/77209-370443-gravityzone.html)
 
 ## 🔧 Command Line Options
 
@@ -127,6 +117,11 @@ define command {
     command_line    $USER1$/check_bitdefender/bin/check_bitdefender lastseen -d $HOSTALIAS$ -W 7 -C 30
 }
 
+define command {
+    command_name    check_bitdefender_lastscan
+    command_line    $USER1$/check_bitdefender/bin/check_bitdefender lastscan -d $HOSTALIAS$ -W 7 -C 30
+}
+
 ```
 
 ### Service Definitions
@@ -147,6 +142,13 @@ define service {
     hostgroup_name          bitdefender
 }
 
+define service {
+    use                     generic-service
+    service_description     BITDEFENDER_LASTSCAN
+    check_command           check_bitdefender_lastscan
+    hostgroup_name          bitdefender
+}
+
 ```
 
 ## 🏗️ Architecture
@@ -158,22 +160,27 @@ check_bitdefender/
 ├── 📁 cli/                     # Command-line interface
 │   ├── commands/               # Individual command handlers
 │   │   ├── endpoints.py        # List endpoints command
-│   ├── decorators.py          # Common CLI decorators
-│   └── handlers.py            # CLI handlers
+│   │   ├── onboarding.py       # Onboarding status command
+│   │   ├── lastseen.py         # Last seen command
+│   │   ├── lastscan.py         # Last scan command
+│   │   └── detail.py           # Endpoint detail command
+│   └── decorators.py           # Common CLI decorators
 ├── 📁 core/                    # Core business logic
-│   ├── auth.py                # Authentication management
-│   ├── config.py              # Configuration handling
-│   ├── defender.py            # Defender API client
-│   ├── exceptions.py          # Custom exceptions
-│   ├── nagios.py              # Nagios plugin framework
-│   └── logging_config.py      # Logging configuration
+│   ├── auth.py                 # Authentication management
+│   ├── config.py               # Configuration handling
+│   ├── defender.py             # BitDefender API client
+│   ├── exceptions.py           # Custom exceptions
+│   └── nagios.py               # Nagios plugin framework
 ├── 📁 services/                # Business services
-│   ├── endpoints_service.py    # Endpoints business logic
-│   └── models.py              # Data models
+│   ├── endpoint_service.py     # Endpoints business logic
+│   ├── onboarding_service.py   # Onboarding check logic
+│   ├── lastseen_service.py     # Last seen check logic
+│   ├── lastscan_service.py     # Last scan check logic
+│   ├── detail_service.py       # Detail retrieval logic
+│   └── models.py               # Data models
 └── 📁 tests/                   # Comprehensive test suite
     ├── unit/                   # Unit tests
-    ├── integration/            # Integration tests
-    └── fixtures/               # Test fixtures
+    └── integration/            # Integration tests
 ```
 
 ### Key Design Principles
@@ -244,15 +251,7 @@ DEFENDER WARNING - Last seen: 10 days ago | lastseen=10;7;30;0;
 
 ### Critical State
 ```
-DEFENDER CRITICAL - Vulnerability score: 150 (1 Critical, 5 High) | vulnerabilities=150;10;100;0;
-```
-
-### Alerts Warning
-```
-DEFENDER WARNING - Unresolved alerts for endpoint.domain.com | alerts=2;1;5;0;
-Unresolved alerts for endpoint.domain.com
-2025-09-14T10:22:14.12Z - Suspicious activity detected (New high)
-2025-09-14T12:00:00.00Z - Malware detection (InProgress medium)
+DEFENDER CRITICAL - Last scan: 35 days ago | lastscan=35;7;30;0;
 ```
 
 ## 🔧 Troubleshooting
@@ -261,8 +260,8 @@ Unresolved alerts for endpoint.domain.com
 
 | Issue | Solution |
 |-------|----------|
-| **Authentication Errors** | Verify Azure app permissions and credentials |
-| **Network Connectivity** | Check firewall rules for Microsoft endpoints |
+| **Authentication Errors** | Verify BitDefender GravityZone API token |
+| **Network Connectivity** | Check firewall rules for cloudgz.gravityzone.bitdefender.com |
 | **Import Errors** | Ensure all dependencies are installed |
 | **Configuration Issues** | Validate config file syntax and paths |
 
@@ -272,7 +271,7 @@ Enable verbose logging for detailed troubleshooting:
 
 ```bash
 # Maximum verbosity
-check_bitdefender vulnerabilities -d endpoint.domain.tld -vvv
+check_bitdefender lastseen -d endpoint.domain.tld -vvv
 
 # Check specific configuration
 check_bitdefender onboarding -c /path/to/config.ini -d endpoint.domain.tld -vv
@@ -316,8 +315,8 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ## 🙏 Acknowledgments
 
 - Built with [nagiosplugin](https://nagiosplugin.readthedocs.io/) framework
-- Uses [Azure Identity SDK](https://docs.microsoft.com/python/api/azure-identity/) for authentication
 - Powered by [Click](https://click.palletsprojects.com/) for CLI interface
+- Integrates with [BitDefender GravityZone API](https://www.bitdefender.com/business/support/en/77209-370443-gravityzone.html)
 
 ---
 

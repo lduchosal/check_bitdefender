@@ -1,7 +1,6 @@
 """Authentication management."""
 
 import configparser
-from typing import Union
 from check_bitdefender.core.exceptions import ConfigurationError
 
 
@@ -14,5 +13,9 @@ def get_token(
 
     auth_section = config["auth"]
     token = auth_section.get("token")
+
+    if not token:
+        raise ConfigurationError("Missing 'token' in [auth] section")
+
     return token
 

@@ -3,7 +3,7 @@
 import base64
 import time
 import requests
-from typing import Any, Dict, cast
+from typing import Any, Dict, Optional, cast
 from check_bitdefender.core.exceptions import DefenderAPIError
 from check_bitdefender.core.logging_config import get_verbose_logger
 
@@ -18,7 +18,7 @@ class DefenderClient:
         timeout: int = 15,
         region: str = "api",
         verbose_level: int = 0,
-        parent_id: str = None,
+        parent_id: Optional[str] = None,
     ) -> None:
         """Initialize with authenticator and optional region.
 
@@ -52,7 +52,7 @@ class DefenderClient:
         encoded = base64.b64encode((self.authenticator + ":").encode()).decode()
         return f"Basic {encoded}"
 
-    def list_endpoints(self, parent_id: str = None) -> Dict[str, Any]:
+    def list_endpoints(self, parent_id: Optional[str] = None) -> Dict[str, Any]:
         """List all endpoints from BitDefender GravityZone.
 
         Uses the JSONRPC API endpoint to retrieve the list of all endpoints
@@ -106,7 +106,7 @@ class DefenderClient:
         try:
             while True:
                 # Prepare JSONRPC request with pagination
-                params = {
+                params: Dict[str, Any] = {
                     "page": page,
                     "perPage": per_page
                 }
