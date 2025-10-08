@@ -104,16 +104,20 @@ def test_list_endpoints_success(mock_post, client):
             "items": [
                 {
                     "id": "ep1",
-                    "fqdn": "host1.domain.com",
-                    "isManaged": True,
-                    "operatingSystemVersion": "Windows 10",
+                    "details": {
+                        "fqdn": "host1.domain.com",
+                        "isManaged": True,
+                        "operatingSystemVersion": "Windows 10",
+                    },
                     "lastSeen": "2024-01-01T00:00:00Z"
                 },
                 {
                     "id": "ep2",
                     "name": "host2",
-                    "isManaged": False,
-                    "operatingSystemVersion": "Linux Ubuntu",
+                    "details": {
+                        "isManaged": False,
+                        "operatingSystemVersion": "Linux Ubuntu",
+                    },
                     "lastSuccessfulScan": {"date": "2024-01-02T00:00:00Z"}
                 }
             ],
