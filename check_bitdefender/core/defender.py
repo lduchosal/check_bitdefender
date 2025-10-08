@@ -212,3 +212,84 @@ class DefenderClient:
             return "Mac"
         else:
             return "Unknown"
+
+    def get_endpoint_details(self, endpoint_id: str) -> Dict[str, Any]:
+        """Get detailed information about a specific endpoint.
+
+        Args:
+            endpoint_id: The endpoint ID to retrieve details for
+
+        Returns:
+            Dictionary containing endpoint details with structure:
+            {
+                "id": "endpoint_id",
+                "name": "hostname",
+                "operatingSystem": "OS name",
+                "lastSeen": "2015-06-22T13:46:59",
+                "lastSuccessfulScan": {
+                    "name": "scan_name",
+                    "date": "2023-07-19T04:09:29+00:00"
+                },
+                "malwareStatus": {
+                    "detection": false,
+                    "infected": false
+                },
+                "riskScore": {
+                    "value": "81%"
+                }
+            }
+
+        Raises:
+            DefenderAPIError: If the API request fails
+        """
+        self.logger.method_entry("get_endpoint_details", endpoint_id=endpoint_id)
+        start_time = time.time()
+
+        url = f"{self.base_url}/api/v1.0/jsonrpc/network"
+        headers = {
+            "Content-Type": self.application_json,
+            "Authorization": self._get_auth_header()
+        }
+
+        payload = {
+            "params": {
+                "endpointId": endpoint_id,
+                "options": {
+                    "includeScanLogs": True
+                }
+            },
+            "jsonrpc": "2.0",
+            "method": "getManagedEndpointDetails",
+            "id": f"check_bitdefender_details_{endpoint_id}"
+        }
+
+        self.logger.info(f"Requesting endpoint details from {url} (endpoint_id: {endpoint_id})")
+        self.logger.debug(f"Request method: {payload['method']}")
+
+        try:
+            response = requests.post(
+                url,
+                json=payload,
+                headers=headers,
+                timeout=self.timeout,
+                verify=True
+            )
+            response.raise_for_status()
+
+            data = response.json()
+
+            # Extract result from JSONRPC response
+            if "result" not in data:
+                raise DefenderAPIError("Invalid API response: missing 'result' field")
+
+            result = data["result"]
+            elapsed_time = time.time() - start_time
+            self.logger.info(f"API request completed in {elapsed_time:.2f}s")
+            self.logger.method_exit("get_endpoint_details", "success")
+
+            return cast(Dict[str, Any], result)
+
+        except requests.exceptions.RequestException as e:
+            elapsed_time = time.time() - start_time
+            self.logger.error(f"API request failed after {elapsed_time:.2f}s: {str(e)}")
+            raise DefenderAPIError(f"Failed to get endpoint details: {str(e)}")

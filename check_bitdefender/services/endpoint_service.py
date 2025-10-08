@@ -46,7 +46,7 @@ class EndpointsService:
         sorted_endpoints = sorted(
             endpoints,
             key=lambda x: (
-                status_priority[x["onboardingStatus"] or ""],
+                status_priority.get(x["onboardingStatus"] or "", 99),
                 x["computerDnsName"] or "",
             ),
         )

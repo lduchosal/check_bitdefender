@@ -75,9 +75,24 @@ class LastSeenService:
             self.logger.method_exit("get_result", result)
             return result
 
+
+        endpoint_id = matching_endpoint["id"]
+        # Get detailed information about the endpoint
+        self.logger.info(f"Fetching details for endpoint: {endpoint_id}")
+        try:
+            details_data = self.defender.get_endpoint_details(endpoint_id)
+        except Exception as e:
+            self.logger.error(f"Failed to get endpoint details: {str(e)}")
+            result = {
+                "value": 0,  # Not found/error
+                "details": [f"Failed to get endpoint details: {str(e)}"],
+            }
+            self.logger.method_exit("get_result", result)
+            return result
+
         # Calculate days since last seen
         computer_name = matching_endpoint.get("computerDnsName", dns_name or endpoint_id)
-        last_seen_date = matching_endpoint.get("lastSeen")
+        last_seen_date = details_data.get("lastSeen")
 
         if not last_seen_date:
             self.logger.info(f"Endpoint has no last seen date: {computer_name}")

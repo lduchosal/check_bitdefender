@@ -1,7 +1,6 @@
 ﻿# Detail of an endpoint
 
 https://www.bitdefender.com/business/support/en/77209-128476-network.html
-
 ## request
 ```
   {

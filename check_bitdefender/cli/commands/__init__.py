@@ -4,6 +4,7 @@ from typing import Any
 from .endpoints import register_endpoints_commands
 from .onboarding import register_onboarding_commands
 from .lastseen import register_lastseen_commands
+from .detail import register_detail_commands
 
 
 def register_all_commands(main_group: Any) -> None:
@@ -11,3 +12,4 @@ def register_all_commands(main_group: Any) -> None:
     register_endpoints_commands(main_group)
     register_onboarding_commands(main_group)
     register_lastseen_commands(main_group)
+    register_detail_commands(main_group)
