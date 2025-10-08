@@ -1,6 +1,5 @@
 """Unit tests for data models."""
 
-import pytest
 from datetime import datetime, timezone
 from check_bitdefender.services.models import (
     OnboardingStatus,
