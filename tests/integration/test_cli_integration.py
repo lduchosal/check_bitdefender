@@ -26,10 +26,9 @@ class TestHelpCommand:
             in result.output
         )
         assert "Commands:" in result.output
+        assert "endpoints" in result.output
         assert "lastseen" in result.output
         assert "onboarding" in result.output
-        assert "vulnerabilities" in result.output
-        assert "detail" in result.output
 
     def test_help_flag(self, cli_runner):
         """Test --help flag displays usage information."""
@@ -46,43 +45,17 @@ class TestLastSeenCommand:
     """Test lastseen command functionality."""
 
     @patch("check_bitdefender.cli.commands.lastseen.load_config")
-    @patch("check_bitdefender.cli.commands.lastseen.get_authenticator")
-    @patch("check_bitdefender.cli.commands.lastseen.DefenderClient")
-    @patch("check_bitdefender.cli.commands.lastseen.LastSeenService")
-    @patch("check_bitdefender.cli.commands.lastseen.NagiosPlugin")
-    def test_lastseen_without_args(
-        self, mock_nagios, mock_service, mock_client, mock_auth, mock_config, cli_runner
-    ):
-        """Test lastseen command without arguments."""
-        # Setup mocks
-        mock_config.return_value = {"config": "test"}
-        mock_auth.return_value = Mock()
-        mock_client.return_value = Mock()
-        mock_service_instance = Mock()
-        mock_service.return_value = mock_service_instance
-        mock_plugin = Mock()
-        mock_nagios.return_value = mock_plugin
-        mock_plugin.check.return_value = 0
-
-        result = cli_runner.invoke(main, ["lastseen"])
-
-        assert result.exit_code == 0
-        mock_plugin.check.assert_called_once_with(
-            endpoint_id=None, dns_name=None, warning=7, critical=30, verbose=0
-        )
-
-    @patch("check_bitdefender.cli.commands.lastseen.load_config")
-    @patch("check_bitdefender.cli.commands.lastseen.get_authenticator")
+    @patch("check_bitdefender.cli.commands.lastseen.get_token")
     @patch("check_bitdefender.cli.commands.lastseen.DefenderClient")
     @patch("check_bitdefender.cli.commands.lastseen.LastSeenService")
     @patch("check_bitdefender.cli.commands.lastseen.NagiosPlugin")
     def test_lastseen_with_dns_name(
-        self, mock_nagios, mock_service, mock_client, mock_auth, mock_config, cli_runner
+        self, mock_nagios, mock_service, mock_client, mock_token, mock_config, cli_runner
     ):
         """Test lastseen command with DNS name."""
         # Setup mocks
         mock_config.return_value = {"config": "test"}
-        mock_auth.return_value = Mock()
+        mock_token.return_value = "test_token"
         mock_client.return_value = Mock()
         mock_service_instance = Mock()
         mock_service.return_value = mock_service_instance
@@ -102,6 +75,66 @@ class TestLastSeenCommand:
         )
 
     @patch("check_bitdefender.cli.commands.lastseen.load_config")
+    @patch("check_bitdefender.cli.commands.lastseen.get_token")
+    @patch("check_bitdefender.cli.commands.lastseen.DefenderClient")
+    @patch("check_bitdefender.cli.commands.lastseen.LastSeenService")
+    @patch("check_bitdefender.cli.commands.lastseen.NagiosPlugin")
+    def test_lastseen_with_endpoint_id(
+        self, mock_nagios, mock_service, mock_client, mock_token, mock_config, cli_runner
+    ):
+        """Test lastseen command with endpoint ID."""
+        # Setup mocks
+        mock_config.return_value = {"config": "test"}
+        mock_token.return_value = "test_token"
+        mock_client.return_value = Mock()
+        mock_service_instance = Mock()
+        mock_service.return_value = mock_service_instance
+        mock_plugin = Mock()
+        mock_nagios.return_value = mock_plugin
+        mock_plugin.check.return_value = 0
+
+        result = cli_runner.invoke(main, ["lastseen", "-i", "ep123"])
+
+        assert result.exit_code == 0
+        mock_plugin.check.assert_called_once_with(
+            endpoint_id="ep123",
+            dns_name=None,
+            warning=7,
+            critical=30,
+            verbose=0,
+        )
+
+    @patch("check_bitdefender.cli.commands.lastseen.load_config")
+    @patch("check_bitdefender.cli.commands.lastseen.get_token")
+    @patch("check_bitdefender.cli.commands.lastseen.DefenderClient")
+    @patch("check_bitdefender.cli.commands.lastseen.LastSeenService")
+    @patch("check_bitdefender.cli.commands.lastseen.NagiosPlugin")
+    def test_lastseen_with_custom_thresholds(
+        self, mock_nagios, mock_service, mock_client, mock_token, mock_config, cli_runner
+    ):
+        """Test lastseen command with custom thresholds."""
+        # Setup mocks
+        mock_config.return_value = {"config": "test"}
+        mock_token.return_value = "test_token"
+        mock_client.return_value = Mock()
+        mock_service_instance = Mock()
+        mock_service.return_value = mock_service_instance
+        mock_plugin = Mock()
+        mock_nagios.return_value = mock_plugin
+        mock_plugin.check.return_value = 0
+
+        result = cli_runner.invoke(main, ["lastseen", "-d", "endpoint.domain.tld", "-w", "14", "-c", "60"])
+
+        assert result.exit_code == 0
+        mock_plugin.check.assert_called_once_with(
+            endpoint_id=None,
+            dns_name="endpoint.domain.tld",
+            warning=14,
+            critical=60,
+            verbose=0,
+        )
+
+    @patch("check_bitdefender.cli.commands.lastseen.load_config")
     def test_lastseen_command_error(self, mock_config, cli_runner):
         """Test lastseen command error handling."""
         mock_config.side_effect = Exception("Configuration error")
@@ -112,22 +145,29 @@ class TestLastSeenCommand:
         assert result.exit_code == 3
         assert "UNKNOWN: Configuration error" in result.output
 
+    def test_lastseen_command_help(self, cli_runner):
+        """Test lastseen command help displays usage information."""
+        result = cli_runner.invoke(main, ["lastseen", "--help"])
+
+        assert result.exit_code == 0
+        assert "Check endpoint last seen status" in result.output
+
 
 class TestOnboardingCommand:
     """Test onboarding command functionality."""
 
     @patch("check_bitdefender.cli.commands.onboarding.load_config")
-    @patch("check_bitdefender.cli.commands.onboarding.get_authenticator")
+    @patch("check_bitdefender.cli.commands.onboarding.get_token")
     @patch("check_bitdefender.cli.commands.onboarding.DefenderClient")
     @patch("check_bitdefender.cli.commands.onboarding.OnboardingService")
     @patch("check_bitdefender.cli.commands.onboarding.NagiosPlugin")
     def test_onboarding_with_dns_name(
-        self, mock_nagios, mock_service, mock_client, mock_auth, mock_config, cli_runner
+        self, mock_nagios, mock_service, mock_client, mock_token, mock_config, cli_runner
     ):
         """Test onboarding command with DNS name."""
         # Setup mocks
         mock_config.return_value = {"config": "test"}
-        mock_auth.return_value = Mock()
+        mock_token.return_value = "test_token"
         mock_client.return_value = Mock()
         mock_service_instance = Mock()
         mock_service.return_value = mock_service_instance
@@ -147,6 +187,36 @@ class TestOnboardingCommand:
         )
 
     @patch("check_bitdefender.cli.commands.onboarding.load_config")
+    @patch("check_bitdefender.cli.commands.onboarding.get_token")
+    @patch("check_bitdefender.cli.commands.onboarding.DefenderClient")
+    @patch("check_bitdefender.cli.commands.onboarding.OnboardingService")
+    @patch("check_bitdefender.cli.commands.onboarding.NagiosPlugin")
+    def test_onboarding_with_endpoint_id(
+        self, mock_nagios, mock_service, mock_client, mock_token, mock_config, cli_runner
+    ):
+        """Test onboarding command with endpoint ID."""
+        # Setup mocks
+        mock_config.return_value = {"config": "test"}
+        mock_token.return_value = "test_token"
+        mock_client.return_value = Mock()
+        mock_service_instance = Mock()
+        mock_service.return_value = mock_service_instance
+        mock_plugin = Mock()
+        mock_nagios.return_value = mock_plugin
+        mock_plugin.check.return_value = 0
+
+        result = cli_runner.invoke(main, ["onboarding", "-i", "ep123"])
+
+        assert result.exit_code == 0
+        mock_plugin.check.assert_called_once_with(
+            endpoint_id="ep123",
+            dns_name=None,
+            warning=1,
+            critical=2,
+            verbose=0,
+        )
+
+    @patch("check_bitdefender.cli.commands.onboarding.load_config")
     def test_onboarding_command_error(self, mock_config, cli_runner):
         """Test onboarding command error handling."""
         mock_config.side_effect = Exception("Authentication failed")
@@ -155,6 +225,13 @@ class TestOnboardingCommand:
 
         assert result.exit_code == 3
         assert "UNKNOWN: Authentication failed" in result.output
+
+    def test_onboarding_command_help(self, cli_runner):
+        """Test onboarding command help displays usage information."""
+        result = cli_runner.invoke(main, ["onboarding", "--help"])
+
+        assert result.exit_code == 0
+        assert "Check endpoint onboarding status" in result.output
 
 
 class TestVulnerabilitiesCommand:

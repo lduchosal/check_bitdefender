@@ -22,9 +22,10 @@ class DefenderScalarContext(nagiosplugin.ScalarContext):
     def evaluate(
         self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource
     ) -> nagiosplugin.Result:
-        """Evaluate metric against thresholds with <= logic for detail command."""
-        if self.name == "found":
-            # For detail command, use <= threshold logic (not < threshold)
+        """Evaluate metric against thresholds with >= logic for status checks."""
+        if self.name in ["found", "onboarding"]:
+            # For detail and onboarding commands, use >= threshold logic
+            # Higher values indicate problems (not found, not onboarded, etc.)
             # Use original values instead of Range objects for threshold comparison
             critical_val = self._original_critical
             warning_val = self._original_warning
@@ -33,12 +34,12 @@ class DefenderScalarContext(nagiosplugin.ScalarContext):
             warning_triggered = (
                 self._original_warning is not None
                 and warning_val is not None
-                and metric.value <= warning_val
+                and metric.value >= warning_val
             )
             critical_triggered = (
                 self._original_critical is not None
                 and critical_val is not None
-                and metric.value <= critical_val
+                and metric.value >= critical_val
             )
 
             if critical_triggered and warning_triggered:
