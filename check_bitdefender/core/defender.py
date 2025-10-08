@@ -183,8 +183,8 @@ class DefenderClient:
                     {
                         "id": item.get("id"),
                         "fqdn": item.get("details", {}).get("fqdn") or item.get("fqdn") or item.get("name", ""),
-                        "onboardingStatus": self._map_managed_status(item.get("isManaged")),
-                        "osPlatform": self._extract_os_platform(item.get("operatingSystemVersion", "")),
+                        "onboardingStatus": self._map_managed_status(item.get("details", {}).get("isManaged")),
+                        "osPlatform": self._extract_os_platform(item.get("details", {}).get("operatingSystemVersion", "")),
                         # Try lastSeen first, fall back to lastSuccessfulScan.date
                         "lastSeen": item.get("lastSeen") or item.get("lastSuccessfulScan", {}).get("date"),
                     }
